@@ -1,20 +1,10 @@
-# Dockerfile в папке api/Api/Api/
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
-
-# Вариант A: Копируем ВСЕ файлы из текущей папки
+WORKDIR /app
 COPY . .
-
-# Вариант B: Или копируем конкретные файлы
-# COPY ["*.csproj", "./"]
-# COPY . .
-
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app/publish
-
+RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-COPY --from=build /app/publish .
+COPY --from=build /app/out .
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Api.dll"]
