@@ -1,26 +1,20 @@
-# Dockerfile для .NET 9
+# Dockerfile в папке api/Api/Api/
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Копируем файл проекта для оптимизации кэша
-COPY ["Api.csproj", "."]
-RUN dotnet restore
-
-# Копируем остальной код
+# Вариант A: Копируем ВСЕ файлы из текущей папки
 COPY . .
 
-# Собираем
-RUN dotnet build -c Release -o /app/build
+# Вариант B: Или копируем конкретные файлы
+# COPY ["*.csproj", "./"]
+# COPY . .
+
+RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish
 
-# Финальный образ
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app/publish .
-
-# Переменные окружения
-ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:8080
-
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Api.dll"]
