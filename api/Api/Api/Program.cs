@@ -45,4 +45,4 @@ app.UseRouting();
 app.MapControllers();
 
 
-app.Run("http://localhost:5050");
+app.Run();
